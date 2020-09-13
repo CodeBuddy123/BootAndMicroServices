@@ -1,0 +1,83 @@
+application.properties
+----------------------
+spring.datasource.username=scott
+spring.datasource.password=tiger
+spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521:orcl
+
+spring.jpa.properties.hibernate.show_sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.hibernate.ddl-auto=update //this will create table if not available
+
+-------------------------------------------------------
+CustomerEntity.java
+--------------------
+package com.ashsoft.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Entity
+@Data
+@Table(name = "CUST_TABLE")
+public class CustomerEntity {
+	
+	@Id
+	@Column(name = "CUSTOMER_ID")
+	private Integer customerId;
+	@Column(name = "CUSTOMER_NAME")
+	private String customerName;
+	@Column(name = "CUSTOMER_EMAIL")
+	private String customerEmail;
+
+}
+-------------------------------------------------------
+CustomerRepository.java
+-----------------------
+package com.ashsoft.repository;
+
+import java.io.Serializable;
+
+import org.springframework.data.repository.CrudRepository;
+
+import com.ashsoft.entity.CustomerEntity;
+
+public interface CustomerRepository extends CrudRepository<CustomerEntity, Serializable> {
+
+}
+------------------------------------------------------
+Application.java
+---------------
+package com.ashsoft;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import com.ashsoft.entity.CustomerEntity;
+import com.ashsoft.repository.CustomerRepository;
+
+@SpringBootApplication
+public class Application {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+		
+		CustomerRepository customerRepository = context.getBean(CustomerRepository.class);
+		
+		System.out.println(customerRepository.getClass().getName());
+		
+		CustomerEntity entity = new CustomerEntity();
+		
+		entity.setCustomerId(222);
+		entity.setCustomerName("Jason");
+		entity.setCustomerEmail("jasdss@gmail.com");
+		
+		customerRepository.save(entity);
+	}
+
+}
