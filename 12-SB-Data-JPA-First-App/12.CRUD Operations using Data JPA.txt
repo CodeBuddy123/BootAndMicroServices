@@ -1,0 +1,221 @@
+SQL Query
+----------
+CREATE TABLE EMP_DTLS(
+	E_ID NUMBER(5) PRIMARY KEY,
+	E_NAME VARCHAR2(20)
+	E_SAL NUMBER(10,2)
+);
+-------------------------------------------------------pom.xml
+-------
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.3.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.ashsoft</groupId>
+	<artifactId>12-SB-Data-JPA-First-App</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>12-SB-Data-JPA-First-App</name>
+	<description>Autowiring modes</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.oracle.database.jdbc</groupId>
+			<artifactId>ojdbc8</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+------------------------------------------------------
+application.properties
+----------------------
+spring.datasource.username=scott
+spring.datasource.password=tiger
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521:orcl
+spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
+-------------------------------------------------------
+EmpDtlsEntity.java
+------------------
+package com.ashsoft.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+
+@Data
+@Entity
+@Table(name = "EMP_DTLS")
+public class EmpDtlsEntity {
+	
+	@Id
+	@Column(name = "E_ID")
+	private int empId;
+	
+	@Column(name = "E_NAME")
+	private String empName;
+	
+	@Column(name = "E_SAL")
+	private double empSalary;
+
+	
+}
+
+-----------------------------------------------------
+EmpDtlsService.java
+--------------------
+package com.ashsoft.service;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ashsoft.entity.EmpDtlsEntity;
+import com.ashsoft.repository.EmpDtlsRepository;
+
+@Service
+public class EmpDtlsService {
+	
+	@Autowired
+	private EmpDtlsRepository empRepo;
+	
+	public void saveEmp() {
+		EmpDtlsEntity entity = new EmpDtlsEntity();
+		
+		entity.setEmpId(102);
+		entity.setEmpName("Raghu");
+		entity.setEmpSalary(9000);
+		
+		empRepo.save(entity);
+		
+	}
+	
+	public void getEmpById() {
+		Optional<EmpDtlsEntity> findById = empRepo.findById(103);
+		
+		if(findById.isPresent()) {
+			EmpDtlsEntity entity = findById.get();
+			System.out.println(entity);
+		}
+		else
+		{
+			System.out.println("Record Not found..");
+		}
+	}
+	
+	public void getAllEmps() {
+		Iterable<EmpDtlsEntity> findAll = empRepo.findAll();
+		
+		findAll.forEach(entity->{
+			System.out.println(entity);
+		});
+	}
+	
+	public void deleteEmp() {
+		empRepo.deleteById(102);
+	}
+	
+	public void updateEmp()
+	{
+		EmpDtlsEntity entity = new EmpDtlsEntity();
+		
+		entity.setEmpId(101);
+		entity.setEmpSalary(8000);
+		
+		empRepo.save(entity);
+	}
+}
+
+-----------------------------------------------------
+EmpDtlsRepository.java
+-----------------------
+package com.ashsoft.repository;
+
+import java.io.Serializable;
+
+import org.springframework.data.repository.CrudRepository;
+
+import com.ashsoft.entity.EmpDtlsEntity;
+
+
+//@Repository  --> Optional
+public interface EmpDtlsRepository extends CrudRepository<EmpDtlsEntity, Serializable> {
+
+}
+-------------------------------------------------------
+Application.java
+----------------
+package com.ashsoft;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import com.ashsoft.service.EmpDtlsService;
+
+@SpringBootApplication
+public class Application {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+		
+		EmpDtlsService service = context.getBean(EmpDtlsService.class);
+		//service.saveEmp();
+		
+		
+		//service.getEmpById();
+		
+		//service.getAllEmps();
+		
+		//service.deleteEmp();
+		
+		service.updateEmp();
+		
+		context.close();
+	}
+
+}  
