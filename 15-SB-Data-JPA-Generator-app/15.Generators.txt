@@ -1,0 +1,138 @@
+Student.java
+-------------
+package com.ashsoft.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Entity
+@Data
+@Table(name = "STUDENTS_TBL")
+public class Student {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@Column(name = "STUDENT_ID")
+	private Integer studentId;
+	@Column(name = "STUDENT_NAME")
+	private String studentName;
+	@Column(name = "STUDENT_GENDER")
+	private String studentGender;
+}
+-----------------------------------------------------
+Order.java
+----------
+package com.ashsoft.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Entity
+@Data
+@Table(name = "ORDERS_TBL")
+public class Order {
+	@Id
+	@GeneratedValue(generator = "OID-SEQ", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "OID-SEQ",sequenceName = "ORDER_ID_SEQ", allocationSize =1 )
+	@Column(name = "ORDER_ID")
+	private Integer orderId;
+	
+	@Column(name = "ORDER_BY")
+	private String orderBy;
+	
+	@Column(name = "ORDER_STATUS")
+	private String orderStatus;
+}
+-----------------------------------------------------
+StudentRepository.java
+-----------------------
+package com.ashsoft.repository;
+
+import java.io.Serializable;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.ashsoft.entity.Student;
+
+public interface StudentRepository extends JpaRepository<Student, Serializable> {
+
+}
+-----------------------------------------------------
+OrderRepository.java
+---------------------
+package com.ashsoft.repository;
+
+import java.io.Serializable;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.ashsoft.entity.Order;
+
+public interface OrderRepository extends JpaRepository<Order, Serializable> {
+
+}
+-----------------------------------------------------
+application.properties
+-----------------------
+spring.datasource.username=scott
+spring.datasource.password=tiger
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521:orcl
+spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+spring.profiles.active=dev
+-----------------------------------------------------
+Application.java
+----------------
+package com.ashsoft;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import com.ashsoft.entity.Order;
+import com.ashsoft.entity.Student;
+import com.ashsoft.repository.OrderRepository;
+import com.ashsoft.repository.StudentRepository;
+
+@SpringBootApplication
+public class Application {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
+		StudentRepository studentRepository = context.getBean(StudentRepository.class);
+		
+		Student entity = new Student();
+		entity.setStudentName("Raghu");
+		entity.setStudentGender("male");
+		
+		studentRepository.save(entity);
+		
+		OrderRepository orderRepository = context.getBean(OrderRepository.class);
+		
+		/*
+		 * Order order = new Order(); order.setOrderBy("Rakul");
+		 * order.setOrderStatus("Pending");
+		 * 
+		 * orderRepository.save(order);
+		 */
+		
+		context.close();
+	}
+
+}
