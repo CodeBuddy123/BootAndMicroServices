@@ -1,0 +1,259 @@
+pom.xml
+-------
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.4.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.ashsoft</groupId>
+	<artifactId>19-SB-MVC-Sending-Data-To-UI-App</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>19-SB-MVC-Sending-Data-To-UI-App</name>
+	<description>Sending Data to UI from Controller</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+----------------------------------------------------
+WelcomeController.java
+----------------------
+package com.ashsoft.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class WelcomeController {
+	
+	@RequestMapping("/welcome")
+	public String displayWelcomeMsg(Model model) {
+		model.addAttribute("msg","Welcome to Ashsoft!");
+		return "index";
+	}
+}
+-------------------------------------------------------
+index.jsp
+---------
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>${msg}</h1>
+</body>
+</html>
+-----------------------------------------------------
+application.properties
+----------------------
+server.port=5454
+
+spring.mvc.view.prefix=/views/
+spring.mvc.view.suffix=.jsp
+----------------------------------------------------
+ProductController.java
+----------------------
+package com.ashsoft.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class ProductController {
+	
+	@GetMapping("/product")
+	public String getProductData(Model model) {
+		
+		model.addAttribute("pid", "101");
+		model.addAttribute("pname", "Monitor");
+		model.addAttribute("price", "10,000 INR");
+		return "product";
+	}
+}
+-----------------------------------------------------
+product.jsp
+-----------
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<table>
+		<tr>
+			<td>Product ID:</td>
+			<td>${pid}</td>
+		</tr>
+		<tr>
+			<td>Product Name:</td>
+			<td>${pname}</td>
+		</tr>
+		<tr>
+			<td>Product Price:</td>
+			<td>${price}</td>
+		</tr>
+	</table>
+</body>
+</html>
+-----------------------------------------------------
+User.java
+---------
+package com.ashsoft.domain;
+
+public class User {
+	
+	private Integer userId;
+	private String firstName;
+	private String lastName;
+	private String gender;
+	private String dob;
+	public Integer getUserId() {
+		return userId;
+	}
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	public String getGender() {
+		return gender;
+	}
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+	public String getDob() {
+		return dob;
+	}
+	public void setDob(String dob) {
+		this.dob = dob;
+	}
+}
+-----------------------------------------------------
+UserController.java
+-------------------
+package com.ashsoft.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.ashsoft.domain.User;
+
+@Controller
+public class UserController {
+	
+	@GetMapping("/user")
+	public String getUserData(Model model) {
+		
+		User userObj = new User();
+		userObj.setUserId(2222);
+		userObj.setFirstName("Mike");
+		userObj.setLastName("Hudson");
+		userObj.setGender("Male");
+		userObj.setDob("31-12-1992");
+		
+		model.addAttribute("userdata", userObj);
+		
+		return "user";
+	}
+}
+----------------------------------------------------
+user.jsp
+--------
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<table>
+		<tr>
+			<td>User ID:</td>
+			<td>${userdata.userId}</td>
+		</tr>
+		<tr>
+			<td>First Name:</td>
+			<td>${userdata.firstName}</td>
+		</tr>
+		<tr>
+			<td>Last Name:</td>
+			<td>${userdata.lastName}</td>
+		</tr>
+		<tr>
+			<td>Date of Birth:</td>
+			<td>${userdata.dob}</td>
+		</tr>
+		<tr>
+			<td>Gender:</td>
+			<td>${userdata.gender}</td>
+		</tr>
+	</table>
+</body>
+</html>
