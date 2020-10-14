@@ -1,0 +1,113 @@
+Book.java
+---------
+package com.ashsoft.binding;
+
+import lombok.Data;
+
+@Data
+public class Book {
+	private String bookName;
+	private String authorName;
+	private String bookPrice;
+}
+-----------------------------------------------------
+BookController.java
+--------------------
+package com.ashsoft.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import com.ashsoft.binding.Book;
+
+@Controller
+public class BookController {
+	
+	@GetMapping("/loadForm")
+	public String loadBookForm() {
+		return "bookform";
+	}
+	
+	@PostMapping("/saveBook")
+	public String displayBookData(Model model, Book bookObj) {
+		
+		model.addAttribute("book", bookObj);
+		
+		return "display";
+	}
+}
+------------------------------------------------------
+application.properties
+-----------------------
+server.port=5454
+
+spring.mvc.view.prefix=/views/
+spring.mvc.view.suffix=.jsp
+-----------------------------------------------------
+bookform.jsp
+------------
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h2 style='color:blue'>Add Book</h2>
+<form action="saveBook" method="POST">
+<table>
+<tr>
+	<td>Book Name</td>
+	<td><input type="text" name="bookName"></td>
+</tr>
+<tr>
+	<td>Author Name</td>
+	<td><input type="text" name="authorName"></td>
+</tr>
+<tr>
+	<td>Book Price</td>
+	<td><input type="text" name="bookPrice"></td>
+</tr>
+<tr>
+	<td></td>
+	<td><input type="submit" value="Add"></td>
+</tr>
+</table>
+</form>
+
+</body>
+</html>
+-----------------------------------------------------
+display.jsp
+-----------
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>Book Details</h1>
+<table border="1" bgcolor='pink'>
+<tr>
+	<td>Book Name</td>
+	<td>${book.bookName}</td>
+</tr>
+<tr>
+	<td>Book Author</td>
+	<td>${book.authorName}</td>
+</tr>
+<tr>
+	<td>Book Price</td>
+	<td>${book.bookPrice}</td>
+</tr>
+</table>
+
+</body>
+</html>
