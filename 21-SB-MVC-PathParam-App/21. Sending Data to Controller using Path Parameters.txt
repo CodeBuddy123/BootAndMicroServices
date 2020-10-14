@@ -1,0 +1,45 @@
+BookController.java
+-------------------
+package com.ashsoft.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@Controller
+public class BookController {
+	
+	@GetMapping("/price/{bname}/{aname}")
+	public String displayBookMsg(@PathVariable("bname") String bname, @PathVariable("aname") String aname,Model model) {
+		
+		String msgText= aname+" Book "+bname+" Price is:: 400 Dollars";
+		
+		model.addAttribute("msg", msgText);
+		
+		return "index";
+	}
+
+}
+-----------------------------------------------------
+application.properties
+----------------------
+server.port=5454
+
+spring.mvc.view.prefix=/views/
+spring.mvc.view.suffix=.jsp
+------------------------------------------------------
+index.jsp
+---------
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>${msg}</h1>
+</body>
+</html>
