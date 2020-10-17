@@ -1,0 +1,373 @@
+registration.jsp
+----------------
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+ 
+ <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<h3>Student Registration Form</h3>
+	<form:form action="studentReg" method="POST" modelAttribute="student">
+		
+		<table>
+			<tr>
+				<td>First Name</td>
+				<td><form:input path="firstName"/></td>
+			</tr>
+			<tr>
+				<td>Last Name</td>
+				<td><form:input path="lastName"/></td>
+			</tr>
+			<tr>
+				<td>Email</td>
+				<td><form:input path="email"/></td>
+			</tr>
+			<tr>
+				<td>Gender</td>
+				<td>
+					<form:radiobutton path="gender"  value ="male"/>Male
+					<form:radiobutton path="gender" value="female"/>Female
+				</td>
+			</tr>
+			<tr>
+				<td>Course</td>
+				<td>
+					<form:select path="course">
+						<form:option value="select">Select</form:option>
+						<form:option value="java">Java</form:option>
+						<form:option value="python">Python</form:option>
+						<form:option value="selenium">Selenium</form:option>
+					</form:select>
+				</td>
+			</tr>
+			<tr>
+				<td>Timings</td>
+				<td>
+					<form:checkbox path="timings" value="morning"/>Morning
+					<form:checkbox path="timings" value="evening"/>Evening
+					<form:checkbox path="timings" value="afternoon"/>Afternoon
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="Register"></td>
+			</tr>
+		
+		</table>
+	</form:form>
+</body>
+</html>
+------------------------------------------------------
+StudentController.java
+----------------------
+package com.ashsoft.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import com.ashsoft.binding.Student;
+
+@Controller
+public class StudentController {
+	
+	@GetMapping("/student")
+	public String loadForm(Model model) {
+		
+		Student s = new Student();
+		
+		model.addAttribute("student", s);
+		
+		return "registration";
+	}
+	
+	
+	@PostMapping("/studentReg")
+	public String handleSubmitButton(Student student, Model model)
+	{
+		System.out.println(student);
+		
+		// TODO: Logic to store data in DB
+		
+		model.addAttribute("name", student.getFirstName()+" "+student.getLastName());
+		return "success";
+		
+	}
+}
+-----------------------------------------------------
+Updated Version with Dynamic form
+---------------------------------
+registration.jsp
+----------------
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+ 
+ <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	
+	<h3>Student Registration Form</h3>
+	<form:form action="studentReg" method="POST" modelAttribute="student">
+		
+		<table>
+			<tr>
+				<td>First Name</td>
+				<td><form:input path="firstName"/></td>
+			</tr>
+			<tr>
+				<td>Last Name</td>
+				<td><form:input path="lastName"/></td>
+			</tr>
+			<tr>
+				<td>Email</td>
+				<td><form:input path="email"/></td>
+			</tr>
+			<tr>
+				<td>Gender</td>
+				<td>
+					<%-- <form:radiobutton path="gender"  value ="male"/>Male
+					<form:radiobutton path="gender" value="female"/>Female --%>
+					
+					<form:radiobuttons path="gender" items="${genders}"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Course</td>
+				<td>
+					<form:select path="course">
+						<%--<form:option value="select">Select</form:option>
+						<form:option value="java">Java</form:option>
+						<form:option value="python">Python</form:option>
+						<form:option value="selenium">Selenium</form:option> --%>
+						<form:options items="${courses}"/>
+					</form:select>
+				</td>
+			</tr>
+			<tr>
+				<td>Timings</td>
+				<td>
+					<%--<form:checkbox path="timings" value="morning"/>Morning
+					<form:checkbox path="timings" value="evening"/>Evening
+					<form:checkbox path="timings" value="afternoon"/>Afternoon --%>
+					<form:checkboxes items="${timings}" path="timings"/>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="Register"></td>
+			</tr>
+		
+		</table>
+	</form:form>
+</body>
+</html>
+-----------------------------------------------------
+StudentService.java
+-------------------
+package com.ashsoft.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class StudentService {
+
+	public List<String> getGenders(){
+		
+		List<String>genders = new ArrayList();
+		genders.add("Male");
+		genders.add("Female");	
+		return genders;
+	}
+	
+	public List<String> getCourses(){
+		List<String>courses = new ArrayList();
+		
+		courses.add("Java");
+		courses.add("Python");
+		courses.add("Selenium");
+		courses.add("Docker");
+		return courses;
+	}
+	
+	public List<String> getTimings(){
+		List<String>timings = new ArrayList();
+		
+		timings.add("Morning");
+		timings.add("Afternoon");
+		timings.add("Evening");
+		return timings;
+	}
+}
+-----------------------------------------------------
+StudentController.java
+-----------------------
+package com.ashsoft.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import com.ashsoft.binding.Student;
+import com.ashsoft.service.StudentService;
+
+@Controller
+public class StudentController {
+	
+	@Autowired
+	private StudentService studentService;
+	
+	
+	@GetMapping("/student")
+	public String loadForm(Model model) {
+		
+		Student s = new Student();
+		
+		model.addAttribute("student", s);
+		
+		model.addAttribute("genders", studentService.getGenders());
+		
+		model.addAttribute("courses", studentService.getCourses());
+		
+		model.addAttribute("timings", studentService.getTimings());
+		
+		
+		return "registration";
+	}
+	
+	
+	@PostMapping("/studentReg")
+	public String handleSubmitButton(Student student, Model model)
+	{
+		System.out.println(student);
+		
+		// TODO: Logic to store data in DB
+		
+		model.addAttribute("name", student.getFirstName()+" "+student.getLastName());
+		return "success";
+		
+	}
+}
+-----------------------------------------------------
+success.jsp
+-----------
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h3 style='color:blue'> Hi ${name}, your Registration is Success.<br>
+ Our Team will get in touch with you Shortly.</h3>
+</body>
+</html>
+-----------------------------------------------------
+Student.java
+-------------
+package com.ashsoft.binding;
+
+import lombok.Data;
+
+@Data
+public class Student {
+	
+	private String firstName;
+	private String lastName;
+	private String email;
+	private String gender;
+	private String course;
+	private String[] timings;
+}
+-----------------------------------------------------
+application.properties
+----------------------
+server.port=5454
+
+spring.mvc.view.prefix=/views/
+spring.mvc.view.suffix=.jsp
+-----------------------------------------------------
+pom.xml
+-------
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.4.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.ashsoft</groupId>
+	<artifactId>21-SB-MVC-Student-Reg-Form-App</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>21-SB-MVC-Student-Reg-Form-App</name>
+	<description>Complex Form with Form Tag Lib</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
