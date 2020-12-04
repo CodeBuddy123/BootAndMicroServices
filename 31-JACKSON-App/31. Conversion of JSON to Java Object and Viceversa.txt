@@ -1,0 +1,103 @@
+Product.java
+------------
+package com.ashsoft.binding;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Product {
+	
+	
+	@JsonProperty("pid") //changes the keyname in the JSON format
+	private Integer productId;
+	
+	
+	@JsonProperty("pname")
+	private String productName;
+	
+	@JsonProperty("pprice")
+	private Double productPrice;
+	
+	
+	public Integer getProductId() {
+		return productId;
+	}
+	public void setProductId(Integer productId) {
+		this.productId = productId;
+	}
+	public String getProductName() {
+		return productName;
+	}
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+	@Override
+	public String toString() {
+		return "Product [productId=" + productId + ", productName=" + productName + ", productPrice=" + productPrice
+				+ "]";
+	}
+	public Double getProductPrice() {
+		return productPrice;
+	}
+	public void setProductPrice(Double productPrice) {
+		this.productPrice = productPrice;
+	}
+}
+-------------------------------------------------------
+JavaToJsonConverter.java
+------------------------
+package com.ashsoft;
+
+import java.io.File;
+
+import com.ashsoft.binding.Product;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class JavaToJsonConverter {
+
+	public static void main(String[] args) throws Exception{
+		
+		Product product = new Product();
+		product.setProductId(111);
+		product.setProductName("Keyboard");
+		product.setProductPrice(5000.0);
+		
+		ObjectMapper mapper =  new ObjectMapper();
+		
+		mapper.writerWithDefaultPrettyPrinter().writeValue(new File("product.json"), product);
+		String jsonStr= mapper.writeValueAsString(product);
+		System.out.println(jsonStr);
+
+	}
+
+}
+------------------------------------------------------
+JsonToJavaConverter.java
+-------------------------
+package com.ashsoft;
+
+import java.io.File;
+
+import com.ashsoft.binding.Product;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class JsonToJavaConverter {
+
+	public static void main(String[] args) throws Exception{
+		
+		
+		ObjectMapper mapper = new ObjectMapper();
+		
+		Product product= mapper.readValue(new File("product.json"),Product.class);
+		
+		System.out.println(product);
+	}
+
+}
+------------------------------------------------------
+product.json
+------------
+{
+  "pid" : 111,
+  "pname" : "Keyboard",
+  "pprice" : 6000.0
+}
