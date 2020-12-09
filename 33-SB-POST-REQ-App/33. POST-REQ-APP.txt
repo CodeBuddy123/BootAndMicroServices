@@ -1,0 +1,112 @@
+Book.java
+---------
+package com.ashsoft.binding;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+import lombok.Data;
+
+@XmlRootElement
+@Data
+public class Book {
+	
+	private Integer bookId;
+	private String bookName;
+	private Double bookPrice;
+}
+-----------------------------------------------------
+BookRestController.java
+-----------------------
+package com.ashsoft.rest;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ashsoft.binding.Book;
+
+@RestController
+public class BookRestController {
+	
+	@PostMapping(value = "/addBook",
+				consumes = {
+						    "application/json",
+						    "application/xml"
+				           }
+			    )
+	public ResponseEntity<String> addBook(@RequestBody Book book){
+		//logic to store book in db
+		System.out.println(book);
+		String responseMessage = "Book Stored Successfully..";
+		return new ResponseEntity<>(responseMessage,HttpStatus.CREATED);
+	}
+}
+-----------------------------------------------------
+application.properties
+----------------------
+server.port=5341
+-----------------------------------------------------
+pom.xml
+-------
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.4.0</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.ashsoft</groupId>
+	<artifactId>33-SB-POST-REQ-App</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>33-SB-POST-REQ-App</name>
+	<description>Demo project for Spring Boot</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
