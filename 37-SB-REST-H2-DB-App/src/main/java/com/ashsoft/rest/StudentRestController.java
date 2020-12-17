@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ashsoft.binding.Student;
 import com.ashsoft.binding.Students;
+import com.ashsoft.exception.NoDataFoundException;
 import com.ashsoft.repository.StudentRepository;
 
 @RestController
@@ -43,6 +44,10 @@ public class StudentRestController {
 		Optional<Student> findById = studentRepo.findById(sid);
 		if (findById.isPresent()) {
 			std = findById.get();
+		}
+		else
+		{
+			throw new NoDataFoundException("Invalid Student ID");
 		}
 		return new ResponseEntity<Student>(std, HttpStatus.OK);
 	}
