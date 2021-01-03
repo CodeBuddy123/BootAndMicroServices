@@ -1,0 +1,56 @@
+REST API DETAILS
+-------------------
+Application No: 32 in Same Workspace
+
+Method : GET
+
+URL: http://localhost:5341/user
+-------------------------------------------------------
+User.java
+----------
+package com.ashsoft.binding;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+import lombok.Data;
+
+@Data
+@XmlRootElement
+public class User {
+	
+	private Integer userId;
+	private String userName;
+	private String userEmail;
+}
+------------------------------------------------------
+Application.java
+-----------------
+package com.ashsoft;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+import com.ashsoft.binding.User;
+
+@SpringBootApplication
+public class Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+		
+		String endPointUrl="http://localhost:5341/user";
+		
+		RestTemplate rt= new RestTemplate();
+		
+		ResponseEntity<User> restEntity = rt.getForEntity(endPointUrl, User.class);
+		
+		if(restEntity.getStatusCodeValue()==200)
+		{
+			User body= restEntity.getBody();
+			System.out.println(body);
+		}
+	}
+
+}
