@@ -1,0 +1,45 @@
+Dependencies to be Added:-
+1) Devtools
+2) Starter Web
+3) Eureka Discovery Client
+------------------------------------------------------
+Application.java
+----------------
+package com.ashsoft;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+@SpringBootApplication
+@EnableDiscoveryClient //Enable this annotation
+public class Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
+
+}
+-----------------------------------------------------
+WelcomeRestController.java
+---------------------------
+package com.ashsoft.controller;
+
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class WelcomeRestController {
+	
+	@GetMapping("/welcome")
+	public String greetMessage() {
+		
+		return "Hello Everybody! Welcome to Eureka Client...";
+	}
+}
+------------------------------------------------------
+application.properties
+----------------------
+spring.application.name=welcomeapp
+server.port=1111
+
+#eureka.client.serviceUrl.defaultZone=http://localhost:1234/eureka/
