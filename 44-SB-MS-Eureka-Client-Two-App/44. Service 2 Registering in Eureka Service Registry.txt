@@ -1,0 +1,22 @@
+GreetRestController.java
+------------------------
+package com.ashsoft.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class GreetRestController {
+	
+	@GetMapping("/greet")
+	public String greetMessage() {
+		return "Good Evening !";
+	}
+}
+-----------------------------------------------------
+application.properties
+---------------------
+spring.application.name=greetapp
+server.port=2222
+
+#eureka.client.serviceUrl.defaultZone=http://localhost:1234/eureka/
