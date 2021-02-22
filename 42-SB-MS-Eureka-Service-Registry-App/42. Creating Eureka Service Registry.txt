@@ -1,0 +1,34 @@
+Dependencies to be Added:-
+1) Devtools
+2) Starter Web
+3) Eureka Server
+------------------------------------------------------
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+</dependency>
+------------------------------------------------------
+Application.java
+----------------
+package com.ashsoft;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@SpringBootApplication
+@EnableEurekaServer //Enable this annotation
+public class Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
+
+}
+----------------------------------------------------
+application.properties
+----------------------
+server.port=8761
+
+eureka.client.register-with-eureka=false
+#server.port=1234
