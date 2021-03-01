@@ -1,0 +1,28 @@
+Application.java
+----------------
+package com.ashsoft;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@SpringBootApplication
+@EnableEurekaServer
+public class Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
+
+}
+
+------------------------------------------------------
+application.yml
+---------------
+server:
+  port: 8761
+ 
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
