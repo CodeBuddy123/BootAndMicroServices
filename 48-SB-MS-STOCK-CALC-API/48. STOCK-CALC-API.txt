@@ -1,0 +1,165 @@
+Application.java
+----------------
+package com.ashsoft;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
+public class Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
+
+}
+----------------------------------------------------
+StockPriceClient.java
+---------------------
+package com.ashsoft.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(name = "STOCK-PRICE-API") 
+public interface StockPriceClient {
+	
+	@GetMapping("/getCost/{companyName}")
+	public ResponseEntity<Double> getStockPrice(@PathVariable("companyName") String companyName);
+	
+	/***
+	 * Method Signature must be same as the method in StockPriceRestController
+	 * except the method Name. Feign Client, sends a request by getting the details
+	 * from Service Registry using name attribute mentioned in FeignClient Annotation
+	 */
+}
+------------------------------------------------------
+StockCalculationRestController.java
+------------------------------------
+package com.ashsoft.rest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import com.ashsoft.client.StockPriceClient;
+
+@RestController
+public class StockCalculationRestController {
+    
+	@Autowired
+	private StockPriceClient client;
+	@GetMapping("/calculate/{name}/{qty}")
+	public ResponseEntity<String> calculate(@PathVariable("name") String companyName,
+			@PathVariable("qty") Integer qty) {
+		
+		/*String endPointurl = "http://localhost:1111/getCost/{companyName}";
+
+		RestTemplate rt = new RestTemplate();
+		ResponseEntity<Double> forEntity = rt.getForEntity(endPointurl, Double.class, companyName);
+      */
+		 ResponseEntity<Double> forEntity = client.getStockPrice(companyName);
+		
+		if (forEntity.getStatusCodeValue() == 200) {
+			Double body = forEntity.getBody();
+			String response = "Total Cost is: " + body * qty;
+			return new ResponseEntity<String>(response, HttpStatus.OK);
+		}
+
+		return null;
+	}
+}
+-----------------------------------------------------
+application.yml
+---------------
+server:
+  port: 2222
+spring:
+  application:
+    name: STOCK-CALC-API
+-------------------------------------------------------
+pom.xml
+-------
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.9.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.ashsoft</groupId>
+	<artifactId>48-SB-MS-STOCK-CALC-API</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>48-SB-MS-STOCK-CALC-API</name>
+	<description>Demo project for Spring Boot</description>
+	<properties>
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Hoxton.SR10</spring-cloud.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
