@@ -1,0 +1,202 @@
+
+data.sql(under resources)
+-------------------------
+INSERT INTO STOCK_PRICE (STOCK_ID,COMPANY_NAME,STOCK_COST) VALUES(101,'BHEL',56.67);
+
+INSERT INTO STOCK_PRICE (STOCK_ID,COMPANY_NAME,STOCK_COST) VALUES(102,'MRF',155.63);
+
+INSERT INTO STOCK_PRICE (STOCK_ID,COMPANY_NAME,STOCK_COST) VALUES
+(103,'SBI',344.05);
+-----------------------------------------------------
+application.yml
+----------------------
+server:
+  port: 1111
+
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    password: null
+    url: jdbc:h2:mem:testdb
+    username: sa
+  application:
+    name: STOCK-PRICE-API
+-----------------------------------------------------
+Application.java
+----------------
+package com.ashsoft;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+public class Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
+
+}
+-----------------------------------------------------
+StockPrice.java
+---------------
+package com.ashsoft.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name="STOCK_PRICE")
+public class StockPrice {
+	
+	@Id
+	@Column(name="STOCK_ID")
+	private Integer stockId;
+	@Column(name="COMPANY_NAME")
+	private String companyName;
+	@Column(name="STOCK_COST")
+	private Double stockCost;
+}
+------------------------------------------------------
+StockPriceRepository.java
+-------------------------
+package com.ashsoft.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.ashsoft.entity.StockPrice;
+
+public interface StockPriceRepository extends JpaRepository<StockPrice, Integer> {
+	
+	StockPrice findByCompanyName(String name);
+
+}
+-----------------------------------------------------
+StockPriceRestController.java
+-----------------------------
+package com.ashsoft.rest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ashsoft.entity.StockPrice;
+import com.ashsoft.repository.StockPriceRepository;
+
+@RestController
+public class StockPriceRestController {
+	@Autowired
+	private StockPriceRepository repo;
+
+	@GetMapping("/getCost/{companyName}")
+	public ResponseEntity<Double> getCostByCompany(@PathVariable("companyName") String name) {
+		StockPrice stockPriceObj = repo.findByCompanyName(name);
+		Double stockCost = stockPriceObj.getStockCost();
+		return new ResponseEntity<Double>(stockCost, HttpStatus.OK);
+	}
+}
+-------------------------------------------------------
+pom.xml
+-------
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.9.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.ashsoft</groupId>
+	<artifactId>47-SB-MS-STOCK-PRICE-API</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>47-SB-MS-STOCK-PRICE-API</name>
+	<description>Demo project for Spring Boot</description>
+	<properties>
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Hoxton.SR10</spring-cloud.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+
