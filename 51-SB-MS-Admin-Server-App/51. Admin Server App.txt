@@ -1,0 +1,11 @@
+dependency to be added
+----------------------
+<dependency>
+				<groupId>de.codecentric</groupId>
+	<artifactId>spring-boot-admin-starter-	server</artifactId>
+</dependency>
+----------------------------------------------
+application.properties
+----------------------
+server.port=1234
+================================================
