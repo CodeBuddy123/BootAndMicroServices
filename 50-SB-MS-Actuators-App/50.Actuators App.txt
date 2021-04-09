@@ -1,0 +1,21 @@
+application.yml
+---------------
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: beans
+        include: '*'
+server:
+  port: 1234
+
+info:
+  app: 
+    name: SB_REST_API
+    description: This is sample application for actuators
+----------------------------------------------------
+Dependency to be added in pom.xml
+----------------------------------
+<dependency>				<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>

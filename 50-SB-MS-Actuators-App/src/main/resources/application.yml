@@ -1,0 +1,13 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: beans
+        include: '*'
+server:
+  port: 1234
+
+info:
+  app: 
+    name: SB_REST_API
+    description: This is sample application for actuators
